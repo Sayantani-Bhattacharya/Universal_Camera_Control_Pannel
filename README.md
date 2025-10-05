@@ -1,7 +1,6 @@
 # Universal Camera Control Pannel
 A Universal Pannel (GUI) for controlling Camera Drivers from Linux systems. 
 
-
 ## Features:
 1. Abstaction layer over V4L2 (Video4Linux2) API.
 2. Works on System76 Ubuntu20 and RasberryPi ARM. 
@@ -23,10 +22,13 @@ A Universal Pannel (GUI) for controlling Camera Drivers from Linux systems.
 13. exposure time absolute
 14. exposure dynamic frame rate
     
-
 ## Camera Hardware Currently tested on:
 1. Blue ROV low-light monocular HD.
 </br> Later:
 2. Realsense D405.
 3. Realsense D4xx series.
 4. OAK D Lite.
+
+
+
+
