@@ -6,6 +6,21 @@ A Universal Pannel (GUI) for controlling Camera Drivers from Linux systems.
 2. Works on System76 Ubuntu20 and RasberryPi ARM. 
 3. For frames of type H.264 (Compressed). Later will extend for YUYV and RGB. 
 
+## Directions:
+1. Clone the repo and run.
+    
+        python3 pannel.py
+
+2. To visualize the changes live, apt install g-streamer and run:
+
+        gst-launch-1.0 -v v4l2src device=/dev/video4 !   'video/x-h264, width=1920, height=1080, framerate=30/1' !   h264parse ! avdec_h264 ! videoconvert ! autovideosink
+
+## Pannel GUI:
+<p align="center">
+  <img src="/GUI.png" alt="Alt text" width="800"/>
+</p>
+
+
 ## Modifiable Params: 
 1. brightness
 2. contrast
