@@ -4,7 +4,26 @@ import subprocess
 
 DEVICE = "/dev/video4"
 
-# Define camera controls (name: (min, max, default))
+def run_cmd(cmd):
+    subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+def set_control(name, value):
+    """Send v4l2-ctl command to set a camera parameter."""
+    try:
+        val = int(float(value)) # Convert safely: "32.0" → 32
+        run_cmd(["v4l2-ctl", "-d", DEVICE, f"--set-ctrl={name}={val}"])
+    except Exception as e:
+        print(f"Error setting {name}: {e}")
+
+def toggle_auto_exposure():
+    run_cmd(["v4l2-ctl", "-d", DEVICE, "--set-ctrl=auto_exposure=1"])  # manual
+
+def toggle_white_balance():
+    run_cmd(["v4l2-ctl", "-d", DEVICE, "--set-ctrl=white_balance_automatic=0"])  # manual
+
+root = tk.Tk()
+root.title("Camera Control Panel")
+
 controls = {
     "brightness": (-64, 64, 0),
     "contrast": (0, 64, 32),
@@ -18,19 +37,11 @@ controls = {
     "exposure_time_absolute": (1, 5000, 156),
 }
 
-def set_control(name, value):
-    """Send v4l2-ctl command to set a camera parameter."""
-    try:
-        val = int(float(value))  # ✅ convert safely: "32.0" → 32
-        cmd = ["v4l2-ctl", "-d", DEVICE, f"--set-ctrl={name}={val}"]
-        subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    except Exception as e:
-        print(f"Error setting {name}: {e}")
+# Buttons to enable manual control
+ttk.Button(root, text="Enable Manual Exposure", command=toggle_auto_exposure).grid(row=0, column=0, padx=10, pady=5)
+ttk.Button(root, text="Enable Manual White Balance", command=toggle_white_balance).grid(row=0, column=1, padx=10, pady=5)
 
-root = tk.Tk()
-root.title("Camera Control Panel")
-
-for idx, (ctrl, (minv, maxv, default)) in enumerate(controls.items()):
+for idx, (ctrl, (minv, maxv, default)) in enumerate(controls.items(), start=1):
     ttk.Label(root, text=ctrl).grid(row=idx, column=0, sticky="w", padx=10)
     slider = ttk.Scale(
         root, from_=minv, to=maxv, orient="horizontal",
