@@ -12,9 +12,9 @@ DEVICE = "/dev/video4"
 
 # Dictionary to store slider widgets for easy access
 sliders = {}
-
-
-
+# Variables to track toggle states
+auto_exposure_enabled = True
+white_balance_enabled = True
 
 
 
@@ -34,6 +34,8 @@ def save_parameters():
     params = {}
     for ctrl, (_, _, default) in controls.items():
         params[ctrl] = sliders[ctrl].get()  # Get the current value from the slider
+    params["auto_exposure_enabled"] = auto_exposure_enabled
+    params["white_balance_enabled"] = white_balance_enabled
     try:
         with open(PARAMS_FILE, "w") as f:
             json.dump(params, f)
@@ -50,15 +52,29 @@ def load_parameters():
             if ctrl in controls:
                 set_control(ctrl, value)  # Update the camera control
                 sliders[ctrl].set(value)  # Update the slider value
+        auto_exposure_enabled = params.get("auto_exposure_enabled", True)
+        white_balance_enabled = params.get("white_balance_enabled", True)
+        toggle_auto_exposure() if not auto_exposure_enabled else None
+        toggle_white_balance() if not white_balance_enabled else None
         print("Parameters loaded successfully.")
     except Exception as e:
         print(f"Error loading parameters: {e}")
 
 def toggle_auto_exposure():
-    run_cmd(["v4l2-ctl", "-d", DEVICE, "--set-ctrl=auto_exposure=1"])  # manual
+    """Toggle auto exposure and update the state."""
+    global auto_exposure_enabled  
+    auto_exposure_enabled = not auto_exposure_enabled  
+    value = 1 if auto_exposure_enabled else 0
+    run_cmd(["v4l2-ctl", "-d", DEVICE, f"--set-ctrl=auto_exposure={value}"])
+    print(f"Auto Exposure {'enabled' if auto_exposure_enabled else 'disabled'}.")
 
 def toggle_white_balance():
-    run_cmd(["v4l2-ctl", "-d", DEVICE, "--set-ctrl=white_balance_automatic=0"])  # manual
+    """Toggle white balance and update the state."""
+    global white_balance_enabled
+    white_balance_enabled = not white_balance_enabled
+    value = 1 if white_balance_enabled else 0
+    run_cmd(["v4l2-ctl", "-d", DEVICE, f"--set-ctrl=white_balance_automatic={value}"])
+    print(f"White Balance {'enabled' if white_balance_enabled else 'disabled'}.")
 
 root = tk.Tk()
 root.title("Camera Control Panel")
